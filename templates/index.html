@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple URL Shortener</title>
+    <style>
+        body { font-family: sans-serif; margin: 50px; text-align: center; background-color: #f4f4f4; }
+        .container { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; }
+        input[type="text"] { width: 300px; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .result { margin-top: 20px; font-weight: bold; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple URL Shortener</h1>
+        <form id="shortenForm">
+            <input type="text" id="longUrlInput" placeholder="Enter long URL here..." required>
+            <button type="submit">Shorten URL</button>
+        </form>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('shortenForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const longUrl = document.getElementById('longUrlInput').value;
+            const resultDiv = document.getElementById('result');
+
+            try {
+                const response = await fetch('/shorten', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ long_url: longUrl })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = 'Short URL: <a href="' + data.short_url + '">' + data.short_url + '</a>';
+                    document.getElementById('longUrlInput').value = ''; // Clear input
+                } else {
+                    resultDiv.innerHTML = 'Error: ' + data.error;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = 'Network error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
